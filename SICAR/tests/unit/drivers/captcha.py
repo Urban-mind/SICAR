@@ -28,17 +28,18 @@ class CaptchaTests(unittest.TestCase):
         named_temp_jpg = MagicMock()
         named_temp_jpg.__enter__.return_value.name = "temp.jpg"
 
-        with patch(
-            "tempfile.NamedTemporaryFile",
-            side_effect=[
-                named_temp_png,
-                named_temp_jpg,
-            ],
-        ) as mock_tempfile, patch("matplotlib.image.imread") as imread_mock, patch(
-            "matplotlib.image.imsave"
-        ) as imsave_mock, patch(
-            "cv2.imread"
-        ) as cv2_imread_mock:
+        with (
+            patch(
+                "tempfile.NamedTemporaryFile",
+                side_effect=[
+                    named_temp_png,
+                    named_temp_jpg,
+                ],
+            ) as mock_tempfile,
+            patch("matplotlib.image.imread") as imread_mock,
+            patch("matplotlib.image.imsave") as imsave_mock,
+            patch("cv2.imread") as cv2_imread_mock,
+        ):
             imread_mock.return_value = np.array([[0, 255], [255, 0]])
             imsave_mock.return_value = None
             cv2_imread_mock.return_value = np.array([[0, 255], [255, 0]])
@@ -50,7 +51,7 @@ class CaptchaTests(unittest.TestCase):
             self.assertEqual(mock_tempfile.call_count, 2)
             self.assertEqual(
                 mock_tempfile.call_args_list,
-                [call(suffix=".png"), call(suffix=".jpg")],
+                [call(suffix=".png", delete=False), call(suffix=".jpg", delete=False)],
             )
             imsave_mock.assert_called_once_with(
                 "temp.jpg",

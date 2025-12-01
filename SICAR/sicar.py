@@ -9,6 +9,7 @@ Classes:
 
 import io
 import os
+import ssl
 import time
 import random
 import httpx
@@ -18,6 +19,11 @@ from tqdm import tqdm
 from typing import Dict
 from pathlib import Path
 from urllib.parse import urlencode
+import warnings
+
+warnings.filterwarnings(
+    "ignore", category=DeprecationWarning, message="ssl.PROTOCOL_TLSv1_2 is deprecated"
+)
 
 from SICAR.drivers import Captcha, Tesseract
 from SICAR.state import State
@@ -142,8 +148,12 @@ class Sicar(Url):
             None
         """
         timeout = httpx.Timeout(read_timeout, connect=connect_timeout)
+
+        context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+        context.set_ciphers("RSA+AESGCM:RSA+AES:!aNULL:!MD5:!DSS")
+
         self._session = httpx.Client(
-            verify=False,
+            verify=context,
             transport=httpx.HTTPTransport(retries=retries),
             timeout=timeout,
             http2=use_http2,
