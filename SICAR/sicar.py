@@ -149,11 +149,8 @@ class Sicar(Url):
         """
         timeout = httpx.Timeout(read_timeout, connect=connect_timeout)
 
-        context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
-        context.set_ciphers("RSA+AESGCM:RSA+AES:!aNULL:!MD5:!DSS")
-
         self._session = httpx.Client(
-            verify=context,
+            verify=False,
             transport=httpx.HTTPTransport(retries=retries),
             timeout=timeout,
             http2=use_http2,
