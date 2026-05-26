@@ -154,7 +154,7 @@ class Sicar(Url):
 
         self._session = httpx.Client(
             verify=False,
-            transport=httpx.HTTPTransport(retries=retries),
+            transport=httpx.HTTPTransport(retries=retries, verify=False, http2=use_http2, proxy=proxy),
             timeout=timeout,
             http2=use_http2,
             proxy=proxy,
